@@ -4,12 +4,15 @@ import RandomChar from "../randomChar/randomChar";
 import CharList from "../charList/charList";
 import CharInfo from "../charInfo/charInfo";
 import decoration from "../resources/img/vision (2).png";
+import ComicList from "../style/comicList/cimicList";
+import AppBanner from "../AppBaner/appBaner";
 
 
 export default class App extends Component{
    render(){
     return(
         <div className="app">
+            <AppBanner/>
             <AppHeader/>
             <main>
             <RandomChar/>
@@ -20,7 +23,7 @@ export default class App extends Component{
            </div>
            <img src={decoration} alt="vision" className="bg-decoration" />
            </main>
-           
+           <ComicList/>
         </div>
     )
    }
