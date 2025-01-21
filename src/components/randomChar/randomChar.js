@@ -4,6 +4,11 @@ import thor from "../resources/img/thor (2).jpeg"
 import mjolnir from "../resources/img/mjolnir (2).png"
 
 export default class RandomChar extends Component{
+  state={
+    name:null,
+    description: null,
+    thumbnail:null
+  }
     render(){
         return (
             <div className="randomchar">

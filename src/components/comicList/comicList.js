@@ -1,7 +1,7 @@
 import { Component } from "react";
 import "./comicList.scss"
-import uw from "../../resources/img/UW (2).png"
-import xmen from "../../resources/img/x-men (2).png"
+import uw from "../resources/img/UW (2).png"
+import xmen from "../resources/img/x-men (2).png"
 
 export default class ComicList extends Component{
     render(){

@@ -4,7 +4,7 @@ import RandomChar from "../randomChar/randomChar";
 import CharList from "../charList/charList";
 import CharInfo from "../charInfo/charInfo";
 import decoration from "../resources/img/vision (2).png";
-import ComicList from "../style/comicList/cimicList";
+import ComicList from "../comicList/comicList";
 import AppBanner from "../AppBaner/appBaner";
 
 
