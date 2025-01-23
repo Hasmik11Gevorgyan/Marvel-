@@ -52,6 +52,10 @@ export default class RandomChar extends Component {
   render() {
     const { char, loading, error } = this.state;
 
+    
+
+
+
     const isError = error ? <Error /> : null;
     const isLoading = loading ? <Spinner /> : null;
     const isContent = !(loading || error) ? <View char={char} /> : null;
@@ -85,9 +89,11 @@ export default class RandomChar extends Component {
 
 const View = ({ char }) => {
   const { name, description, thumbnail, homepage, wiki } = char;
+
+  const imageClass = thumbnail.includes("image_not_available")? "randomchar__img contain": "randomchar__img cover"
   return (
     <div className="randomchar__block">
-      <img src={thumbnail} alt={name} className="randomchar__img" />
+      <img src={thumbnail} alt={name} className={imageClass} />
       <div className="randomchar__info">
         <p className="randomchar__name">{name}</p>
         <p className="randomchar__descr">{description}</p>
