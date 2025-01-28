@@ -7,6 +7,7 @@ export default class AppHeader extends Component {
     return (
       <header className="app__header">
         <h1 className="app__title">
+          // eslint-disable-next-line jsx-a11y/anchor-is-valid
           <a href="#">
             <span>Marvel</span> information portal
           </a>

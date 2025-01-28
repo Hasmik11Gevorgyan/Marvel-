@@ -1,65 +1,126 @@
 import { Component } from "react";
 import "../charList/charList.scss"
-import abyss from "../resources/img/abyss (2).jpg"
+
 import "../style/style.scss"
 import MarvelService from "../comicList/services/marvelService";
+import Spinner from "../spinner/spinner"
+import Error from "../error/error"
 
 
-export default class CharList extends Component{
-    state = {
-      items:[],
-      activeIndex:0,
-      error:null, 
-    };
+
+export default class CharList extends Component {
+  state = {
+    charList: [],
+    loading: true,
+    onRequestLoading: false,
+    error: false,
+    offset: 0, //  max limit 1560
+    charEnded: false
+  }
+
   marvelService = new MarvelService();
 
+  componentDidMount() {
+    console.log("mount");
+    this.onRequest();
+  }
 
-    handleClick = (index) =>{
-      this.setState({avtiveIndex:index})
+  onRequest = (offset) => {
+    this.onCharListLoading();
+    this.marvelService.getAllCharacters(offset)
+      .then(this.onCharListLoaded)
+      .catch(this.onError);
+  }
+
+  onCharListLoading = () => {
+    this.setState({
+      onRequestLoading: true
+    });
+  }
+
+  onCharListLoaded = (newCharList) => {
+    let ended = false;
+
+    if (newCharList.length < 9) {
+      ended = true;
     }
 
-    componentDidMount(){
-      fetch(`${this._API_URL}/characters?limit=9&offset=210&${this._API_KEY}`)
-      .then((response) =>{
-        if(!response.ok){
-          throw new Error("network error")
-        }
-        return response.json()
-      })
-      .then((data) => this.setState({items:data}))
-      .catch((error) => this.setState({error}))
-    }
-    render(){
+    this.setState(({ charList, offset }) => {
+      return {
+        charList: [...charList, ...newCharList],
+        loading: false,
+        onRequestLoading: false,
+        offset: offset + 9,
+        charEnded: ended
+      };
+    });
+  }
 
-      const {activeIndex,items,error} = this.state;
-      if(error){
-        return <p>{error.message}</p>
+  onError = () => {
+    this.setState({
+      error: true,
+      loading: false
+    });
+  }
+
+  renderItems(arr) {
+    const items = arr.map(({ id, thumbnail, name }) => {
+      let imgStyle = { "objectFit": "cover" };
+      if (thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg") {
+        imgStyle = { "objectFit": "contain" };
       }
-        return (
-          
-            <div className="char__list">
-              <ul className="char__grid">
-                {/* <li className="char__item">
-                  <img src={abyss} alt="abyss"/>
-                  <div className="char__name">Abyss</div>
-                </li>
-                <li className={activeIndex === index?"char__item__selected": ""}>
-                  <img src={abyss} alt="abyss"/>
-                  <div className="char__name">Abyss</div>
-                </li> */}
-                {items.map((item,index)=> (
-                 <li 
-                 onClick={()=>this.handleClick(index)}
-                 className= {activeIndex === index?"char__item__selected": ""}
-                  key= {item.id}
-                 img src={abyss} alt="abyss"
-                 />
-                ))}
-              </ul>
-              <button className="button button__main button__long">
-                <div className="inner">load more</div>
-              </button>
-            </div>
-          );
-    }
+
+      return (
+        <li
+          className="char__item"
+          key={id}
+          onClick={() => this.props.onCharSelected(id)}
+        >
+          <img src={thumbnail} alt={name} style={imgStyle} />
+          <div className="char__name">{name}</div>
+        </li>
+      );
+    });
+
+    return (
+      <ul className="char__grid">
+        {items}
+      </ul>
+    );
+  }
+
+  render() {
+    const {
+      charList,
+      loading,
+      error,
+      onRequestLoading,
+      offset,
+      charEnded
+    } = this.state;
+    const items = this.renderItems(charList);
+
+    const isError = error ? <Error /> : null;
+    const isLoading = loading ? <Spinner /> : null;
+    const isContent = !(loading || error) ? items : null;
+
+    return (
+      <div className="char__list">
+        {isError}
+        {isLoading}
+        {isContent}
+
+        <button
+          onClick={() => this.onRequest(offset)}
+          disabled={onRequestLoading}
+          className="button button__main button__long"
+          style={charEnded ? { "display": "none" } : null}
+        >
+          <div className="inner">
+            {onRequestLoading ? "Loading..." : "load more"}
+          </div>
+        </button>
+      </div>
+    );
+  }
 }
