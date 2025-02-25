@@ -1,78 +1,43 @@
-import { Component } from "react";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 import "../charInfo/charInfo.scss"
-import MarvelService from "../comicList/services/marvelService";
+import useMarvelService from "../comicList/services/marvelService";
 import Spinner from "../spinner/spinner";
 import Error from "../error/error";
 import Skeleton from "../skeleton/skeleton"
 
-export default class CharInfo extends Component {
-  state = {
-    char: null,
-    loading: false,
-    error: false
-  }
+export default function  CharInfo ({charId}) {
+const [char, setChar] = useState(null);
+const  {loading, error,getCharacter,clearError} =  useMarvelService();
 
-  marvelService = new MarvelService();
+useEffect(() => {
+  updateChar();
+}, );
 
-  componentDidMount() {
-    this.updateChar();
-  }
+const updateChar = () => {
+  if (!charId) return;
 
-  componentDidUpdate(preveProps, preveState) {
-    if (this.props.charId !== preveProps.charId) {
-      this.updateChar();
-    }
-  }
+  clearError();
+  getCharacter(charId).then(onCharLoaded);
+};
 
-  updateChar = () => {
-    const { charId } = this.props;
+  const onCharLoaded = (char) => setChar(char);
 
-    if (!charId) return;
+  const iSkeleton = char || loading || error ? null : <Skeleton/>
+  const isError = error ? <Error /> : null;
+  const isLoading = loading ? <Spinner /> : null;
+  const isContent = !(loading || error || !char) ? <View char={char} /> : null;
 
-    this.onCharLoading();
-    this.marvelService
-      .getCharacter(charId)
-      .then(this.onCharLoaded)
-      .catch(this.onError);
-  }
-
-  onError = () => {
-    this.setState({
-      loading: false,
-      error: true
-    });
-  }
-
-  onCharLoaded = (char) => {
-    this.setState({ char, loading: false });
-  }
-
-  onCharLoading = () => {
-    this.setState({
-      loading: true
-    });
-  }
-
-  render() {
-    const { char, loading, error } = this.state;
-
-    const iSkeleton = char || loading || error ? null : <Skeleton/>
-    const isError = error ? <Error /> : null;
-    const isLoading = loading ? <Spinner /> : null;
-    const isContent = !(loading || error || !char) ? <View char={char} /> : null;
-
-    return (
-      <div className="char__info">
-        {iSkeleton}
-        {isError}
-        {isLoading}
-        {isContent}
-      </div>
-    );
-  }
+  return (
+    <div className="char__info">
+      {iSkeleton}
+      {isError}
+      {isLoading}
+      {isContent}
+    </div>
+  )
 }
-
 const View = ({ char }) => {
   const { name, description, thumbnail, homepage, wiki, comics } = char;
   let imgStyle = { "objectFit": "cover" };
@@ -141,3 +106,6 @@ const View = ({ char }) => {
     </>
   );
 };
+CharInfo.propTypes = {
+  charId: PropTypes.number,
+}

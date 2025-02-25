@@ -1,70 +1,50 @@
-import { Component } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../charList/charList.scss"
 
 import "../style/style.scss"
-import MarvelService from "../comicList/services/marvelService";
+import useMarvelService from "../comicList/services/marvelService";
 import Spinner from "../spinner/spinner"
 import Error from "../error/error"
 
 
 
-export default class CharList extends Component {
-  state = {
-    charList: [],
-    loading: true,
-    onRequestLoading: false,
-    error: false,
-    offset: 0, //  max limit 1560
-    charEnded: false
-  }
+export default function CharList ({onCharSelected}) {
+const [charList, setCharList] = useState([]);
+const [onRequestLoading, setOnRequestLoading] = useState(false)
+const [offset, setOffset] = useState(0);
+const [charEnded, setCharEnded] = useState(false);
+ 
+  const  {loading,error,getAllCharacters} = useMarvelService();
 
-  marvelService = new MarvelService();
-
-  componentDidMount() {
-    console.log("mount");
-    this.onRequest();
-  }
-
-  onRequest = (offset) => {
-    this.onCharListLoading();
-    this.marvelService.getAllCharacters(offset)
-      .then(this.onCharListLoaded)
-      .catch(this.onError);
-  }
-
-  onCharListLoading = () => {
-    this.setState({
-      onRequestLoading: true
-    });
-  }
-
-  onCharListLoaded = (newCharList) => {
+  useEffect(() => {
+    onRequest(offset, true);
+  }, );
+  
+  const onRequest = (offset,initial) => {
+    initial ? setOnRequestLoading(false) : setOnRequestLoading(true);
+    getAllCharacters(offset).then(onCharListLoaded)
+  };
+  
+ const  onCharListLoaded = (newCharList) => {
     let ended = false;
 
-    if (newCharList.length < 9) {
-      ended = true;
-    }
+    if (newCharList.length < 9)ended = true; 
 
-    this.setState(({ charList, offset }) => {
-      return {
-        charList: [...charList, ...newCharList],
-        loading: false,
-        onRequestLoading: false,
-        offset: offset + 9,
-        charEnded: ended
-      };
-    });
+    setCharList(charList => [...charList, ...newCharList]);
+    setOnRequestLoading(false);
+    setOffset(offset => offset + 9);
+    setCharEnded(ended);
   }
+const refItems = useRef([]);
 
-  onError = () => {
-    this.setState({
-      error: true,
-      loading: false
-    });
-  }
+ const focusOnItem = (id) =>{
+   refItems.current.forEach(item => item.classList.remove("char__item_selected"));
+   refItems.current[id].classList.add("char__item_selected");
+   refItems.current[id].focus();
+ }
 
-  renderItems(arr) {
-    const items = arr.map(({ id, thumbnail, name }) => {
+ const renderItems = (arr) => {
+    const items = arr.map(({ id, thumbnail, name },i) => {
       let imgStyle = { "objectFit": "cover" };
       if (thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg") {
         imgStyle = { "objectFit": "contain" };
@@ -73,8 +53,13 @@ export default class CharList extends Component {
       return (
         <li
           className="char__item"
-          key={id}
-          onClick={() => this.props.onCharSelected(id)}
+          tabIndex={0}
+          ref={el => refItems.current[i] = el}
+          key={i}
+          onClick={() => {
+            onCharSelected(id);
+            focusOnItem(i);
+          }}
         >
           <img src={thumbnail} alt={name} style={imgStyle} />
           <div className="char__name">{name}</div>
@@ -87,40 +72,29 @@ export default class CharList extends Component {
         {items}
       </ul>
     );
-  }
+  };
+  const items = renderItems(charList);
+ 
+  const isError = error ? <Error /> : null;
+  const isLoading = loading && !onRequestLoading ? <Spinner /> : null;
+  
 
-  render() {
-    const {
-      charList,
-      loading,
-      error,
-      onRequestLoading,
-      offset,
-      charEnded
-    } = this.state;
-    const items = this.renderItems(charList);
+  return (
+    <div className="char__list">
+      {isError}
+      {isLoading}
+      {items}
 
-    const isError = error ? <Error /> : null;
-    const isLoading = loading ? <Spinner /> : null;
-    const isContent = !(loading || error) ? items : null;
-
-    return (
-      <div className="char__list">
-        {isError}
-        {isLoading}
-        {isContent}
-
-        <button
-          onClick={() => this.onRequest(offset)}
-          disabled={onRequestLoading}
-          className="button button__main button__long"
-          style={charEnded ? { "display": "none" } : null}
-        >
-          <div className="inner">
-            {onRequestLoading ? "Loading..." : "load more"}
-          </div>
-        </button>
-      </div>
-    );
-  }
-}
+      <button
+        onClick={() => onRequest(offset)}
+        disabled={onRequestLoading}
+        className="button button__main button__long"
+        style={charEnded ? { "display": "none" } : null}
+      >
+        <div className="inner">
+          {onRequestLoading ? "Loading..." : "load more"}
+        </div>
+      </button>
+    </div>
+  );
+ }
