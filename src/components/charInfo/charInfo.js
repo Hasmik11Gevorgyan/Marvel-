@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 import "../charInfo/charInfo.scss"
-import useMarvelService from "../comicList/services/marvelService";
+import useMarvelService from "../services/marvelService";
 import Spinner from "../spinner/spinner";
 import Error from "../error/error";
 import Skeleton from "../skeleton/skeleton"

@@ -1,10 +1,11 @@
-import useHttp from "../../../hooks/http.hooks";
+import useHttp from "../../hooks/http.hooks";
 
 const  useMarvelService = () => {
   const  {loading,  error, request, clearError} = useHttp();
  
- const  _API_URL = "https://gateway.marvel.com:443/v1/public"
-  const _API_KEY = "apikey=f886cb3db7c49504cc7206fb26ead8c0"
+  const _API_URL = "https://gateway.marvel.com:443/v1/public";
+  // const _API_KEY = "apikey=f886cb3db7c49504cc7206fb26ead8c0";
+  const _API_KEY = "apikey=7a2f90270b6303fe8a6acd07672c5bba";
   const _LIMIT = 9;
  const _CHAR_OFFSET = 210;
 

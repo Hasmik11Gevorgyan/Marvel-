@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import "../charList/charList.scss"
 
 import "../style/style.scss"
-import useMarvelService from "../comicList/services/marvelService";
+import useMarvelService from "../services/marvelService";
 import Spinner from "../spinner/spinner"
 import Error from "../error/error"
 
