@@ -7,24 +7,24 @@ import Spinner from "../spinner/spinner";
 import Error from "../error/error";
 import Skeleton from "../skeleton/skeleton"
 
-export default function  CharInfo ({charId}) {
-const [char, setChar] = useState(null);
-const  {loading, error,getCharacter,clearError} =  useMarvelService();
+export default function CharInfo({ charId }) {
+  const [char, setChar] = useState(null);
+  const { loading, error, getCharacter, clearError } = useMarvelService();
 
-useEffect(() => {
-  updateChar();
-}, );
+  useEffect(() => {
+    updateChar();
+  }, [charId]);
 
-const updateChar = () => {
-  if (!charId) return;
+  const updateChar = () => {
+    if (!charId) return;
 
-  clearError();
-  getCharacter(charId).then(onCharLoaded);
-};
+    clearError();
+    getCharacter(charId).then(onCharLoaded);
+  };
 
   const onCharLoaded = (char) => setChar(char);
 
-  const iSkeleton = char || loading || error ? null : <Skeleton/>
+  const iSkeleton = char || loading || error ? null : <Skeleton />
   const isError = error ? <Error /> : null;
   const isLoading = loading ? <Spinner /> : null;
   const isContent = !(loading || error || !char) ? <View char={char} /> : null;
@@ -36,8 +36,9 @@ const updateChar = () => {
       {isLoading}
       {isContent}
     </div>
-  )
+  );
 }
+
 const View = ({ char }) => {
   const { name, description, thumbnail, homepage, wiki, comics } = char;
   let imgStyle = { "objectFit": "cover" };
@@ -106,6 +107,7 @@ const View = ({ char }) => {
     </>
   );
 };
+
 CharInfo.propTypes = {
   charId: PropTypes.number,
 }
