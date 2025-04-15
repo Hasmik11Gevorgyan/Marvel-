@@ -8,6 +8,7 @@ import CharInfo from "../components/charInfo/CharInfo";
 import ErrorBoundary from "../components/errorBoundary/ErrorBoundary";
 
 import decoration from "../components/resources/img/vision (2).png"
+import CharacterSearch from "../components/CharacterSearch/CharacterSearch";
 
 export default function MainPage() {
   const [selectedChar, setChar] = useState(null);
@@ -25,6 +26,7 @@ export default function MainPage() {
         <ErrorBoundary>
           <CharInfo charId={selectedChar} />
         </ErrorBoundary>
+        <CharacterSearch/>
       </div>
       <img src={decoration} alt="vision" className="bg-decoration" />
     </>

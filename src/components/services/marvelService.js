@@ -6,7 +6,7 @@ const  useMarvelService = () => {
   const _API_URL = "https://gateway.marvel.com:443/v1/public";
   // const _API_KEY = "apikey=f886cb3db7c49504cc7206fb26ead8c0";
   
-  const _API_KEY = "apikey=40e2aa9621e1603b7ea9a63e26483c6d"
+  const _API_KEY = "apikey=0ac8f227d36f2891df0f1b83811b1405"
   const _LIMIT = 9;
   const _CHAR_OFFSET = 210;
 
@@ -42,6 +42,14 @@ return {
 }
 }
 
+const getCharactersByName = async (name) => {
+  const response = await fetch(`${this._apiBase}/characters?nameStartsWith=${name}&apikey=${this._apiKey}`);
+  if (!response.ok) {
+    throw new Error(`Could not fetch characters, status: ${response.status}`);
+  }
+  return await response.json();
+}
+
 const _transformComics = (comics) => {
   return {
     id: comics.id,
@@ -53,7 +61,7 @@ const _transformComics = (comics) => {
     price: comics.prices[0].price ? `$ ${comics.prices[0].price}` : `not available`
   }
 };
-return {loading,error, getAllCharacters,getAllComics,getComic, getCharacter, clearError}
+return {loading,error, getAllCharacters,getAllComics,getComic, getCharacter, clearError,getCharactersByName}
 }
 
 export default useMarvelService;
